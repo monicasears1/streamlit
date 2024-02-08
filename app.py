@@ -3,8 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
-from sklearn.linear_model import LinearRegression
-import numpy as np
 
 # Load the dataset
 df = pd.read_csv('/mnt/data/Power_1_with_Bitcoin.csv', parse_dates=['timestamp'])
@@ -53,7 +51,7 @@ else:
 
 # Data Visualization
 st.header('Data Visualization')
-chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap', 'Correlation Chart', 'Prediction Chart'])
+chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap'])
 
 if chart_type == 'Line Chart':
     st.line_chart(filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']])
@@ -72,21 +70,7 @@ elif chart_type == 'Heatmap':
     plt.figure(figsize=(10, 6))
     sns.heatmap(corr, annot=True)
     st.pyplot(plt)
-elif chart_type == 'Correlation Chart':
-    sns.pairplot(filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']])
-    st.pyplot(plt)
-elif chart_type == 'Prediction Chart':
-    # Simple linear regression for demonstration
-    X = filtered_df[['bitcoin_price']]  # Predictor
-    y = filtered_df['avg_power']  # Response
-    model = LinearRegression().fit(X, y)
-    prediction = model.predict(X)
-    plt.figure(figsize=(10, 6))
-    plt.scatter(X, y, color='blue')
-    plt.plot(X, prediction, color='red')
-    plt.xlabel('Bitcoin Price')
-    plt.ylabel('Average Power')
-    st.pyplot(plt)
+
 
 
 
