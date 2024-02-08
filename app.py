@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
 
-# Load the dataset
-df = pd.read_csv('/mnt/data/Power_1_with_Bitcoin.csv', parse_dates=['timestamp'])
+# Load the dataset directly from GitHub
+file_url = 'https://raw.githubusercontent.com/monicasears1/streamlit/main/Power_1_with_Bitcoin.csv'
+df = pd.read_csv(file_url, parse_dates=['timestamp'])
 
 # Convert timestamp to proper datetime and remove timezone info
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(None)
@@ -70,6 +71,7 @@ elif chart_type == 'Heatmap':
     plt.figure(figsize=(10, 6))
     sns.heatmap(corr, annot=True)
     st.pyplot(plt)
+
 
 
 
