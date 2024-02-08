@@ -3,11 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
+from sklearn.linear_model import LinearRegression
+import numpy as np
 
 # Load the dataset
-df = pd.read_csv('Power 1.csv', parse_dates=['timestamp'])
+df = pd.read_csv('/mnt/data/Power_1_with_Bitcoin.csv', parse_dates=['timestamp'])
 
-# Convert timestamp to proper datetime and remove timezone info to avoid comparison issues
+# Convert timestamp to proper datetime and remove timezone info
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(None)
 
 # App title
@@ -21,7 +23,7 @@ if st.checkbox('Show statistical summary'):
 st.sidebar.header('Time Filtering')
 time_filter = st.sidebar.selectbox('Select Time Period', ['Yesterday', 'Last 7 Days', 'Last 30 Days', 'Last Month'])
 
-# Get current time without timezone information
+# Time filtering logic
 today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 if time_filter == 'Yesterday':
     start_date = today - timedelta(days=1)
@@ -34,13 +36,15 @@ elif time_filter == 'Last Month':
     start_date = first_day_last_month
     today = first_day_last_month + timedelta(days=(today.replace(day=1) - first_day_last_month).days - 1)
 
-# Filtering based on selected time
 filtered_df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= today)]
 
 # Site Level Filtering
 st.sidebar.header('Site Level Filtering')
-site_to_filter = st.sidebar.selectbox('Which site to filter by?', df['client_name'].unique())
-filtered_df = filtered_df[filtered_df['client_name'] == site_to_filter]
+all_sites_option = "All Sites"
+sites = [all_sites_option] + list(df['client_name'].unique())
+site_to_filter = st.sidebar.selectbox('Which site to filter by?', sites)
+if site_to_filter != all_sites_option:
+    filtered_df = filtered_df[filtered_df['client_name'] == site_to_filter]
 
 if st.sidebar.button('Apply Site and Time Filter'):
     st.write(filtered_df)
@@ -49,24 +53,40 @@ else:
 
 # Data Visualization
 st.header('Data Visualization')
-chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap'])
+chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap', 'Correlation Chart', 'Prediction Chart'])
 
 if chart_type == 'Line Chart':
-    st.line_chart(filtered_df[['avg_power', 'active_miners', 'hash_rate']])
+    st.line_chart(filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']])
 elif chart_type == 'Histogram':
-    column_to_plot = st.selectbox('Select column to plot', ['avg_power', 'active_miners', 'hash_rate'])
+    column_to_plot = st.selectbox('Select column to plot', ['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price'])
     plt.figure(figsize=(10, 6))
     sns.histplot(filtered_df[column_to_plot], kde=True)
     st.pyplot(plt)
 elif chart_type == 'Box Plot':
-    column_to_plot = st.selectbox('Select column for box plot', ['avg_power', 'active_miners', 'hash_rate'])
+    column_to_plot = st.selectbox('Select column for box plot', ['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price'])
     plt.figure(figsize=(10, 6))
     sns.boxplot(y=filtered_df[column_to_plot])
     st.pyplot(plt)
 elif chart_type == 'Heatmap':
-    corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
+    corr = filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']].corr()
     plt.figure(figsize=(10, 6))
     sns.heatmap(corr, annot=True)
     st.pyplot(plt)
+elif chart_type == 'Correlation Chart':
+    sns.pairplot(filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']])
+    st.pyplot(plt)
+elif chart_type == 'Prediction Chart':
+    # Simple linear regression for demonstration
+    X = filtered_df[['bitcoin_price']]  # Predictor
+    y = filtered_df['avg_power']  # Response
+    model = LinearRegression().fit(X, y)
+    prediction = model.predict(X)
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X, y, color='blue')
+    plt.plot(X, prediction, color='red')
+    plt.xlabel('Bitcoin Price')
+    plt.ylabel('Average Power')
+    st.pyplot(plt)
+
 
 
