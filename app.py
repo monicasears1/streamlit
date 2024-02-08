@@ -5,14 +5,14 @@ import seaborn as sns
 from datetime import datetime, timedelta
 
 # Load the dataset directly from GitHub
-file_url = 'https://raw.githubusercontent.com/monicasears1/streamlit/main/Power_1_with_Bitcoin.csv'
+file_url = 'https://raw.githubusercontent.com/monicasears1/streamlit/main/Power_1.csv'
 df = pd.read_csv(file_url, parse_dates=['timestamp'])
 
 # Convert timestamp to proper datetime and remove timezone info
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(None)
 
 # App title
-st.title('In-Depth BTC Blockchain Data Analysis App')
+st.title('In-Depth Blockchain Data Analysis App')
 
 # Display a statistical summary
 if st.checkbox('Show statistical summary'):
@@ -20,11 +20,13 @@ if st.checkbox('Show statistical summary'):
 
 # Time Filtering
 st.sidebar.header('Time Filtering')
-time_filter = st.sidebar.selectbox('Select Time Period', ['Yesterday', 'Last 7 Days', 'Last 30 Days', 'Last Month'])
+time_filter = st.sidebar.selectbox('Select Time Period', ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Last Month'])
 
 # Time filtering logic
 today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-if time_filter == 'Yesterday':
+if time_filter == 'Today':
+    start_date = today
+elif time_filter == 'Yesterday':
     start_date = today - timedelta(days=1)
 elif time_filter == 'Last 7 Days':
     start_date = today - timedelta(days=7)
@@ -52,25 +54,30 @@ else:
 
 # Data Visualization
 st.header('Data Visualization')
-chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap'])
+chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap', 'Correlation Chart'])
 
 if chart_type == 'Line Chart':
-    st.line_chart(filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']])
+    st.line_chart(filtered_df[['avg_power', 'active_miners', 'hash_rate']])
 elif chart_type == 'Histogram':
-    column_to_plot = st.selectbox('Select column to plot', ['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price'])
+    column_to_plot = st.selectbox('Select column to plot', ['avg_power', 'active_miners', 'hash_rate'])
     plt.figure(figsize=(10, 6))
-    sns.histplot(filtered_df[column_to_plot], kde=True)
+    sns.histplot(filtered_df[column_to_plot], kde=True, color='mediumspringgreen')
     st.pyplot(plt)
 elif chart_type == 'Box Plot':
-    column_to_plot = st.selectbox('Select column for box plot', ['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price'])
+    column_to_plot = st.selectbox('Select column for box plot', ['avg_power', 'active_miners', 'hash_rate'])
     plt.figure(figsize=(10, 6))
-    sns.boxplot(y=filtered_df[column_to_plot])
+    sns.boxplot(y=filtered_df[column_to_plot], color='cyan')
     st.pyplot(plt)
 elif chart_type == 'Heatmap':
-    corr = filtered_df[['avg_power', 'active_miners', 'hash_rate', 'bitcoin_price']].corr()
+    corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
     plt.figure(figsize=(10, 6))
-    sns.heatmap(corr, annot=True)
+    sns.heatmap(corr, annot=True, cmap='cool')
     st.pyplot(plt)
+elif chart_type == 'Correlation Chart':
+    # Apply the colors for the pairplot through the `palette` parameter
+    sns.pairplot(filtered_df[['avg_power', 'active_miners', 'hash_rate']], palette=['dimgrey', 'mediumspringgreen', 'cyan'])
+    st.pyplot(plt)
+
 
 
 
