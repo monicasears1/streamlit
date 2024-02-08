@@ -3,20 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
-from pandas import to_datetime
-
-# Assuming some_datetime_object is your native datetime object
-# Convert it to the same timezone as your pandas series for comparison
-some_datetime_object_tz = to_datetime(some_datetime_object).tz_localize('UTC')
-
-# Now you can safely compare
-result = df['timestamp'] >= some_datetime_object_tz
 
 # Load the dataset
 df = pd.read_csv('Power 1.csv', parse_dates=['timestamp'])
 
-# Convert timestamp to proper datetime (assuming the timestamps are UTC)
-df['timestamp'] = pd.to_datetime(df['timestamp'])
+# Convert timestamp to proper datetime and remove timezone info to avoid comparison issues
+df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(None)
 
 # App title
 st.title('In-Depth BTC Blockchain Data Analysis App')
@@ -29,17 +21,21 @@ if st.checkbox('Show statistical summary'):
 st.sidebar.header('Time Filtering')
 time_filter = st.sidebar.selectbox('Select Time Period', ['Yesterday', 'Last 7 Days', 'Last 30 Days', 'Last Month'])
 
-today = datetime.now()
+# Get current time without timezone information
+today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 if time_filter == 'Yesterday':
-    filtered_df = df[(df['timestamp'] >= today - timedelta(days=1)) & (df['timestamp'] < today)]
+    start_date = today - timedelta(days=1)
 elif time_filter == 'Last 7 Days':
-    filtered_df = df[(df['timestamp'] >= today - timedelta(days=7)) & (df['timestamp'] < today)]
+    start_date = today - timedelta(days=7)
 elif time_filter == 'Last 30 Days':
-    filtered_df = df[(df['timestamp'] >= today - timedelta(days=30)) & (df['timestamp'] < today)]
+    start_date = today - timedelta(days=30)
 elif time_filter == 'Last Month':
     first_day_last_month = (today.replace(day=1) - timedelta(days=1)).replace(day=1)
-    last_day_last_month = first_day_last_month + timedelta(days=(today.replace(day=1) - first_day_last_month).days)
-    filtered_df = df[(df['timestamp'] >= first_day_last_month) & (df['timestamp'] < last_day_last_month)]
+    start_date = first_day_last_month
+    today = first_day_last_month + timedelta(days=(today.replace(day=1) - first_day_last_month).days - 1)
+
+# Filtering based on selected time
+filtered_df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= today)]
 
 # Site Level Filtering
 st.sidebar.header('Site Level Filtering')
@@ -72,4 +68,5 @@ elif chart_type == 'Heatmap':
     plt.figure(figsize=(10, 6))
     sns.heatmap(corr, annot=True)
     st.pyplot(plt)
+
 
