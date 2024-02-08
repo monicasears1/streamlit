@@ -4,25 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
 
-# Set page config
-st.set_page_config(page_title="In-Depth Blockchain Data Analysis App", page_icon=":bar_chart:", layout="wide")
-
-# Apply custom theme for Streamlit
-st.markdown(
-    """
-    <style>
-    .reportview-container {
-        background-color: #696969;  /* Dimgrey background */
-        color: white;  /* White text */
-    }
-    .sidebar .sidebar-content {
-        background-color: #696969;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Load the dataset directly from GitHub's raw content
 file_url = 'https://raw.githubusercontent.com/monicasears1/streamlit/main/Power%201.csv'
 df = pd.read_csv(file_url, parse_dates=['timestamp'])
@@ -71,38 +52,33 @@ if st.sidebar.button('Apply Site and Time Filter'):
 else:
     st.write(df)
 
-# Setting Matplotlib and Seaborn styles for dark background
-plt.style.use('dark_background')
-sns.set_theme(style="darkgrid")
-sns.set_palette(['mediumspringgreen', 'cyan'])
-
 # Data Visualization
 st.header('Data Visualization')
 chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap'])
 
+# Resetting to default plot styles
+sns.set(style="whitegrid")
+
 if chart_type == 'Line Chart':
     fig, ax = plt.subplots()
-    ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='mediumspringgreen', label='Average Power')
-    ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='cyan', label='Active Miners')
-    ax.set_facecolor('#696969')  # Set background to dimgrey
-    ax.legend()
+    ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='cyan', label='Average Power')
+    ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='cyan', label='Active Miners', linestyle='--')
+    plt.legend()
     st.pyplot(fig)
 elif chart_type == 'Histogram':
     plt.figure(figsize=(10, 6))
-    sns.histplot(filtered_df['avg_power'], color='mediumspringgreen', kde=True)
-    plt.gca().set_facecolor('#696969')
+    sns.histplot(filtered_df['avg_power'], color='cyan', kde=True)
     st.pyplot(plt)
 elif chart_type == 'Box Plot':
     plt.figure(figsize=(10, 6))
     sns.boxplot(data=filtered_df, y='avg_power', color='cyan')
-    plt.gca().set_facecolor('#696969')
     st.pyplot(plt)
 elif chart_type == 'Heatmap':
     corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
     plt.figure(figsize=(10, 6))
     sns.heatmap(corr, annot=True, cmap='cool')
-    plt.gca().set_facecolor('#696969')
     st.pyplot(plt)
+
 
 
 
