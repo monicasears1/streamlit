@@ -3,6 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
+from pandas import to_datetime
+
+# Assuming some_datetime_object is your native datetime object
+# Convert it to the same timezone as your pandas series for comparison
+some_datetime_object_tz = to_datetime(some_datetime_object).tz_localize('UTC')
+
+# Now you can safely compare
+result = df['timestamp'] >= some_datetime_object_tz
 
 # Load the dataset
 df = pd.read_csv('Power 1.csv', parse_dates=['timestamp'])
