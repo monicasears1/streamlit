@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
 
-# Load the dataset directly from GitHub
-file_url = 'https://raw.githubusercontent.com/monicasears1/streamlit/main/Power_1.csv'
+# Load the dataset directly from GitHub's raw content
+file_url = 'https://raw.githubusercontent.com/monicasears1/streamlit/main/Power%201.csv'
 df = pd.read_csv(file_url, parse_dates=['timestamp'])
 
 # Convert timestamp to proper datetime and remove timezone info
@@ -56,6 +56,10 @@ else:
 st.header('Data Visualization')
 chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap', 'Correlation Chart'])
 
+# Define custom color palette
+custom_colors = ['dimgrey', 'mediumspringgreen', 'cyan', 'black', 'white']
+sns.set_palette(custom_colors)
+
 if chart_type == 'Line Chart':
     st.line_chart(filtered_df[['avg_power', 'active_miners', 'hash_rate']])
 elif chart_type == 'Histogram':
@@ -71,11 +75,11 @@ elif chart_type == 'Box Plot':
 elif chart_type == 'Heatmap':
     corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
     plt.figure(figsize=(10, 6))
-    sns.heatmap(corr, annot=True, cmap='cool')
+    sns.heatmap(corr, annot=True, cmap=sns.color_palette(custom_colors, as_cmap=True))
     st.pyplot(plt)
 elif chart_type == 'Correlation Chart':
-    # Apply the colors for the pairplot through the `palette` parameter
-    sns.pairplot(filtered_df[['avg_power', 'active_miners', 'hash_rate']], palette=['dimgrey', 'mediumspringgreen', 'cyan'])
+    # For the correlation chart, let's use a pairplot
+    sns.pairplot(filtered_df[['avg_power', 'active_miners', 'hash_rate']], palette=custom_colors)
     st.pyplot(plt)
 
 
