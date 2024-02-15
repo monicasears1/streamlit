@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import seaborn as sns
 from datetime import datetime, timedelta
 
@@ -76,7 +77,8 @@ if chart_type == 'Line Chart':
     fig, ax = plt.subplots()
     ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='cyan', label='Average Power')
     ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='cyan', label='Active Miners', linestyle='--')
-    ax.tick_params(axis='x', colors='white')
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
+    ax.tick_params(axis='x', colors='white', rotation=45)
     ax.tick_params(axis='y', colors='white')
     plt.legend(loc='upper right', frameon=False, fontsize='small', labelcolor='green')
     st.pyplot(fig)
