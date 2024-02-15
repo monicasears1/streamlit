@@ -16,13 +16,21 @@ st.title('In-Depth Blockchain Data Analysis App')
 
 # Display a statistical summary
 if st.checkbox('Show statistical summary'):
-    st.write(df.describe())
+    descriptive_stats = df.describe().T
+    descriptive_stats['skew'] = df.skew()
+    descriptive_stats['kurt'] = df.kurt()
+    st.write(descriptive_stats)
+    numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
+    for col in numeric_columns:
+        plt.figure(figsize=(10, 4))
+        sns.histplot(df[col], kde=True, color='cyan')
+        plt.title(f'Distribution of {col}')
+        st.pyplot(plt)
 
 # Time Filtering
 st.sidebar.header('Time Filtering')
 time_filter = st.sidebar.selectbox('Select Time Period', ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Last Month'])
 
-# Time filtering logic
 today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 if time_filter == 'Today':
     start_date = today
@@ -56,7 +64,6 @@ else:
 st.header('Data Visualization')
 chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap'])
 
-# Resetting to default plot styles and ensuring white x and y tick labels
 sns.set(style="whitegrid")
 plt.rcParams['text.color'] = 'white'
 plt.rcParams['axes.labelcolor'] = 'white'
@@ -67,20 +74,20 @@ if chart_type == 'Line Chart':
     fig, ax = plt.subplots()
     ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='cyan', label='Average Power')
     ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='cyan', label='Active Miners', linestyle='--')
-    ax.tick_params(axis='x', colors='white')  # Set x tick labels to white
-    ax.tick_params(axis='y', colors='white')  # Set y tick labels to white
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
     plt.legend()
     st.pyplot(fig)
 elif chart_type == 'Histogram':
     plt.figure(figsize=(10, 6))
     sns.histplot(filtered_df['avg_power'], color='cyan', kde=True)
-    plt.tick_params(axis='x', colors='white')  # Set x tick labels to white
-    plt.tick_params(axis='y', colors='white')  # Set y tick labels to white
+    plt.tick_params(axis='x', colors='white')
+    plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
 elif chart_type == 'Box Plot':
     plt.figure(figsize=(10, 6))
     sns.boxplot(data=filtered_df, y='avg_power', color='cyan')
-    plt.tick_params(axis='x', colors='white')  # Not needed for y-only data, but included for consistency
+    plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
 elif chart_type == 'Heatmap':
@@ -90,6 +97,7 @@ elif chart_type == 'Heatmap':
     plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
+
 
 
 
