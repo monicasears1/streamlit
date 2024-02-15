@@ -25,7 +25,7 @@ if st.checkbox('Show statistical summary'):
     st.write(descriptive_stats)
     for col in numeric_cols:
         plt.figure(figsize=(10, 4))
-        sns.histplot(df[col], kde=True, color='green')
+        sns.histplot(df[col], kde=True, color='cyan')
         plt.title(f'Distribution of {col}')
         st.pyplot(plt)
 
@@ -74,28 +74,28 @@ plt.rcParams['ytick.color'] = 'white'
 
 if chart_type == 'Line Chart':
     fig, ax = plt.subplots()
-    ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='green', label='Average Power')
-    ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='green', label='Active Miners', linestyle='--')
+    ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='cyan', label='Average Power')
+    ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='cyan', label='Active Miners', linestyle='--')
     ax.tick_params(axis='x', colors='white')
     ax.tick_params(axis='y', colors='white')
-    plt.legend()
+    plt.legend(loc='upper right', frameon=False, fontsize='small', labelcolor='green')
     st.pyplot(fig)
 elif chart_type == 'Histogram':
     plt.figure(figsize=(10, 6))
-    sns.histplot(filtered_df['avg_power'], color='green', kde=True)
+    sns.histplot(filtered_df['avg_power'], color='cyan', kde=True)
     plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
 elif chart_type == 'Box Plot':
     plt.figure(figsize=(10, 6))
-    sns.boxplot(data=filtered_df, y='avg_power', color='green')
+    sns.boxplot(data=filtered_df, y='avg_power', color='cyan')
     plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
 elif chart_type == 'Heatmap':
     corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
     plt.figure(figsize=(10, 6))
-    sns.heatmap(corr, annot=True, cmap='Greens')
+    sns.heatmap(corr, annot=True, cmap='cool')
     plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
