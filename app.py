@@ -56,28 +56,38 @@ else:
 st.header('Data Visualization')
 chart_type = st.selectbox('Select chart type', ['Line Chart', 'Histogram', 'Box Plot', 'Heatmap'])
 
-# Resetting to default plot styles
+# Resetting to default plot styles and ensuring white x and y tick labels
 sns.set(style="whitegrid")
+plt.rcParams['text.color'] = 'white'
+plt.rcParams['axes.labelcolor'] = 'white'
+plt.rcParams['xtick.color'] = 'white'
+plt.rcParams['ytick.color'] = 'white'
 
 if chart_type == 'Line Chart':
     fig, ax = plt.subplots()
     ax.plot(filtered_df['timestamp'], filtered_df['avg_power'], color='cyan', label='Average Power')
     ax.plot(filtered_df['timestamp'], filtered_df['active_miners'], color='cyan', label='Active Miners', linestyle='--')
+    ax.tick_params(axis='x', colors='white')  # Set x tick labels to white
+    ax.tick_params(axis='y', colors='white')  # Set y tick labels to white
     plt.legend()
     st.pyplot(fig)
 elif chart_type == 'Histogram':
     plt.figure(figsize=(10, 6))
     sns.histplot(filtered_df['avg_power'], color='cyan', kde=True)
+    plt.tick_params(axis='x', colors='white')  # Set x tick labels to white
+    plt.tick_params(axis='y', colors='white')  # Set y tick labels to white
     st.pyplot(plt)
 elif chart_type == 'Box Plot':
     plt.figure(figsize=(10, 6))
     sns.boxplot(data=filtered_df, y='avg_power', color='cyan')
+    plt.tick_params(axis='x', colors='white')  # Not needed for y-only data, but included for consistency
+    plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
 elif chart_type == 'Heatmap':
     corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
     plt.figure(figsize=(10, 6))
-    sns.heatmap(corr, annot=True, cmap='cool')
-    st.pyplot(plt)
+    sns.heatmap(corr, annot
+
 
 
 
