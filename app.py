@@ -14,8 +14,11 @@ df = pd.read_csv(file_url, parse_dates=['timestamp'])
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(None)
 
 # Average values for the same day
-df = df.groupby(df['timestamp'].dt.date).mean().reset_index()
-df['timestamp'] = pd.to_datetime(df['timestamp'])
+df['date'] = df['timestamp'].dt.date
+numeric_columns = df.select_dtypes(include=[np.number]).columns.tolist()
+aggregations = {col: 'mean' for col in numeric_columns}
+df = df.groupby('date').agg(aggregations).reset_index()
+df['timestamp'] = pd.to_datetime(df['date'])
 
 # App title
 st.title('In-Depth Blockchain Data Analysis App')
@@ -105,6 +108,7 @@ elif chart_type == 'Heatmap':
     plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
+
 
 
 
