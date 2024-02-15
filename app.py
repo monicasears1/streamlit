@@ -13,6 +13,10 @@ df = pd.read_csv(file_url, parse_dates=['timestamp'])
 # Convert timestamp to proper datetime and remove timezone info
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(None)
 
+# Average values for the same day
+df = df.groupby(df['timestamp'].dt.date).mean().reset_index()
+df['timestamp'] = pd.to_datetime(df['timestamp'])
+
 # App title
 st.title('In-Depth Blockchain Data Analysis App')
 
@@ -48,7 +52,7 @@ elif time_filter == 'Last Month':
     start_date = first_day_last_month
     today = first_day_last_month + timedelta(days=(today.replace(day=1) - first_day_last_month).days - 1)
 
-filtered_df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= today)]
+filtered_df = df[(df['timestamp'].dt.date >= start_date.date()) & (df['timestamp'].dt.date <= today.date())]
 
 # Site Level Filtering
 st.sidebar.header('Site Level Filtering')
@@ -101,6 +105,7 @@ elif chart_type == 'Heatmap':
     plt.tick_params(axis='x', colors='white')
     plt.tick_params(axis='y', colors='white')
     st.pyplot(plt)
+
 
 
 
