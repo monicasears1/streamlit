@@ -86,8 +86,10 @@ elif chart_type == 'Box Plot':
 elif chart_type == 'Heatmap':
     corr = filtered_df[['avg_power', 'active_miners', 'hash_rate']].corr()
     plt.figure(figsize=(10, 6))
-    sns.heatmap(corr, annot
-
+    sns.heatmap(corr, annot=True, cmap='cool')
+    plt.tick_params(axis='x', colors='white')
+    plt.tick_params(axis='y', colors='white')
+    st.pyplot(plt)
 
 
 
