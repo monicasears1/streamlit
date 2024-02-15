@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
@@ -16,12 +17,13 @@ st.title('In-Depth Blockchain Data Analysis App')
 
 # Display a statistical summary
 if st.checkbox('Show statistical summary'):
-    descriptive_stats = df.describe().T
-    descriptive_stats['skew'] = df.skew()
-    descriptive_stats['kurt'] = df.kurt()
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    descriptive_stats = df[numeric_cols].describe().T
+    skew = df[numeric_cols].skew().rename('skew')
+    kurt = df[numeric_cols].kurt().rename('kurt')
+    descriptive_stats = descriptive_stats.join(skew).join(kurt)
     st.write(descriptive_stats)
-    numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
-    for col in numeric_columns:
+    for col in numeric_cols:
         plt.figure(figsize=(10, 4))
         sns.histplot(df[col], kde=True, color='cyan')
         plt.title(f'Distribution of {col}')
